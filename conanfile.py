@@ -14,6 +14,9 @@ class FBX2glTFConan(ConanFile):
         ("zlib/1.2.11"),
         ("libxml2/2.9.12"),
         ("fmt/5.3.0"),
+        ("libtiff/4.6.0"),
+        ("libpng/1.6.40"),
+        ("libjpeg/9e")
     )
     generators = "cmake_find_package", "cmake_paths"
 

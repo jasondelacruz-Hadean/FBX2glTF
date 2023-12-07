@@ -79,7 +79,7 @@ static const std::vector<TriangleIndex> getIndexArray(const RawModel& raw) {
 ModelData* Raw2Gltf(
     std::ofstream& gltfOutStream,
     const std::string& outputFolder,
-    const RawModel& raw,
+    RawModel& raw,
     const GltfOptions& options) {
   if (verboseOutput) {
     fmt::printf("Building render model...\n");

@@ -22,7 +22,7 @@ class TextureBuilder {
   using pixel_merger = std::function<pixel(const std::vector<const pixel*>)>;
 
   TextureBuilder(
-      const RawModel& raw,
+      RawModel& raw,
       const GltfOptions& options,
       const std::string& outputFolder,
       GltfModel& gltf)
@@ -74,7 +74,7 @@ class TextureBuilder {
   }
 
  private:
-  const RawModel& raw;
+  RawModel& raw;
   const GltfOptions& options;
   std::string outputFolder;
   GltfModel& gltf;

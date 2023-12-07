@@ -70,7 +70,7 @@ static bool TriangleTexturePolarity(const Vec2f& uv0, const Vec2f& uv1, const Ve
 }
 
 static RawMaterialType GetMaterialType(
-    const RawModel& raw,
+    RawModel& raw,
     const int textures[RAW_TEXTURE_USAGE_MAX],
     const bool vertexTransparency,
     const bool skinned) {

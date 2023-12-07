@@ -459,7 +459,7 @@ class RawModel {
   int GetTextureCount() const {
     return (int)textures.size();
   }
-  const RawTexture& GetTexture(const int index) const {
+  RawTexture& GetTexture(const int index) {
     return textures[index];
   }
 

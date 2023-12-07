@@ -50,6 +50,9 @@ find_package(ZLIB MODULE REQUIRED)
 find_package(fmt MODULE REQUIRED)
 find_package(Iconv MODULE REQUIRED)
 find_package(LibXml2  MODULE REQUIRED)
+find_package(TIFF MODULE REQUIRED)
+find_package(PNG MODULE REQUIRED)
+find_package(JPEG MODULE REQUIRED)
 
 # create a compilation database for e.g. clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -178,6 +181,8 @@ set(LIB_SOURCE_FILES
         src/utils/Image_Utils.hpp
         src/utils/String_Utils.hpp
         third_party/CLI11/CLI11.hpp
+        src/tiff2png/tiff2png.cpp
+        src/tiff2png/tiff2png.h
 )
 
 add_library(libFBX2glTF STATIC ${LIB_SOURCE_FILES})
@@ -213,6 +218,9 @@ target_link_libraries(libFBX2glTF
   debug ${FBXSDK_LIBRARY_DEBUG}
   fmt::fmt
   ZLIB::ZLIB
+  TIFF::TIFF
+  PNG::PNG
+  JPEG::JPEG
   LibXml2::LibXml2
   ${ICONV_MAC_LIB}
   ${CMAKE_DL_LIBS}

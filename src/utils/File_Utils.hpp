@@ -74,8 +74,21 @@ inline boost::optional<std::string> GetFileSuffix(const std::string& path) {
   return extension.string().substr(1);
 }
 
+inline void ReplaceFileSuffix(std::string& path, const std::string& ext) {
+  boost::filesystem::path p(path);
+  p.replace_extension(ext);
+  path = p.string();
+}
+
 inline bool MakeDir(const std::string& path) {
   return boost::filesystem::create_directories(boost::filesystem::path(path));
+}
+
+inline void FileDelete(const std::string& path) {
+  boost::filesystem::path p(path);
+  if (boost::filesystem::exists(p)) {
+    boost::filesystem::remove(p);
+  }
 }
 
 } // namespace FileUtils

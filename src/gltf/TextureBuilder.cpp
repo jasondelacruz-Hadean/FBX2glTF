@@ -18,6 +18,8 @@
 #include <gltf/properties/ImageData.hpp>
 #include <gltf/properties/TextureData.hpp>
 
+#include <tiff2png/tiff2png.h>
+
 #ifdef CopyFile
 #undef CopyFile
 #endif
@@ -50,7 +52,7 @@ std::shared_ptr<TextureData> TextureBuilder::combine(
   for (const int rawTexIx : ixVec) {
     TexInfo info(rawTexIx);
     if (rawTexIx >= 0) {
-      const RawTexture& rawTex = raw.GetTexture(rawTexIx);
+      RawTexture& rawTex = raw.GetTexture(rawTexIx);
       const std::string& fileLoc = rawTex.fileLocation;
       const std::string& name = FileUtils::GetFileBase(FileUtils::GetFileName(fileLoc));
       if (!fileLoc.empty()) {
@@ -172,18 +174,30 @@ std::shared_ptr<TextureData> TextureBuilder::simple(int rawTexIndex, const std::
     return iter->second;
   }
 
-  const RawTexture& rawTexture = raw.GetTexture(rawTexIndex);
+  RawTexture& rawTexture = raw.GetTexture(rawTexIndex);
   const std::string textureName = FileUtils::GetFileBase(rawTexture.name);
-  const std::string relativeFilename = FileUtils::GetFileName(rawTexture.fileLocation);
+  std::string relativeFilename = FileUtils::GetFileName(rawTexture.fileLocation);
+
+  // check if we need to convert unsupported textures
+  const auto& suffix = FileUtils::GetFileSuffix(rawTexture.fileLocation);
+  std::string mimeType = ImageUtils::suffixToMimeType(suffix.value());
+  bool isTiff = false;
+  if (suffix.value() == "tiff" || suffix.value() == "tif") {
+    isTiff = true;
+    std::string outputPath = outputFolder + "/" + relativeFilename;
+    FileUtils::ReplaceFileSuffix(outputPath, "png");
+    tiff2png(rawTexture.fileLocation.c_str(), outputPath.c_str(), false, false, 0, -1, false, false, -1.0);
+
+    rawTexture.fileLocation = outputPath;
+    mimeType = "image/png";
+    relativeFilename = FileUtils::GetFileName(rawTexture.fileLocation); // update relateiveFilename
+  }
+
   ImageData* image = nullptr;
   if (options.outputBinary) {
     auto bufferView = gltf.AddBufferViewForFile(*gltf.defaultBuffer, rawTexture.fileLocation);
     if (bufferView) {
-      const auto& suffix = FileUtils::GetFileSuffix(rawTexture.fileLocation);
-      std::string mimeType;
-      if (suffix) {
-        mimeType = ImageUtils::suffixToMimeType(suffix.value());
-      } else {
+      if (!suffix) {
         mimeType = "image/jpeg";
         fmt::printf(
             "Warning: Can't deduce mime type of texture '%s'; using %s.\n",
@@ -191,6 +205,10 @@ std::shared_ptr<TextureData> TextureBuilder::simple(int rawTexIndex, const std::
             mimeType);
       }
       image = new ImageData(relativeFilename, *bufferView, mimeType);
+    }
+    
+    if (isTiff) {
+      FileUtils::FileDelete(rawTexture.fileLocation);
     }
 
   } else if (!relativeFilename.empty()) {    
